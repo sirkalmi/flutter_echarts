@@ -2,9 +2,9 @@ library flutter_echarts;
 
 import 'dart:convert';
 
-import 'package:flutter/widgets.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter/widgets.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'echarts_script.dart' show echartsScript;
@@ -68,7 +68,6 @@ class _EchartsState extends State<Echarts> {
 
     _controller = WebViewController()
       ..setBackgroundColor(Color(0x00000000))
-      ..loadHtmlString(utf8.fuse(base64).decode(htmlBase64))
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setNavigationDelegate(
         NavigationDelegate(
@@ -80,11 +79,13 @@ class _EchartsState extends State<Echarts> {
           },
         ),
       )
-      ..addJavaScriptChannel('Messager', onMessageReceived: (JavaScriptMessage javascriptMessage) {
+      ..addJavaScriptChannel('Messager',
+          onMessageReceived: (JavaScriptMessage javascriptMessage) {
         if (widget.onMessage != null) {
           widget.onMessage!(javascriptMessage.message);
         }
-      });
+      })
+      ..loadHtmlString(utf8.fuse(base64).decode(htmlBase64));
 
     if (widget.reloadAfterInit) {
       new Future.delayed(const Duration(milliseconds: 100), () {
@@ -94,8 +95,14 @@ class _EchartsState extends State<Echarts> {
   }
 
   void init() async {
-    final extensionsStr = this.widget.extensions.length > 0 ? this.widget.extensions.reduce((value, element) => value + '\n' + element) : '';
-    final themeStr = this.widget.theme != null ? '\'${this.widget.theme}\'' : 'null';
+    final extensionsStr = this.widget.extensions.length > 0
+        ? this
+            .widget
+            .extensions
+            .reduce((value, element) => value + '\n' + element)
+        : '';
+    final themeStr =
+        this.widget.theme != null ? '\'${this.widget.theme}\'' : 'null';
     await _controller?.runJavaScript('''
       $echartsScript
       $extensionsStr
@@ -110,7 +117,8 @@ class _EchartsState extends State<Echarts> {
 
   Set<Factory<OneSequenceGestureRecognizer>> getGestureRecognizers() {
     Set<Factory<OneSequenceGestureRecognizer>> set = Set();
-    if (this.widget.captureAllGestures || this.widget.captureHorizontalGestures) {
+    if (this.widget.captureAllGestures ||
+        this.widget.captureHorizontalGestures) {
       set.add(Factory<HorizontalDragGestureRecognizer>(() {
         return HorizontalDragGestureRecognizer()
           ..onStart = (DragStartDetails details) {}
@@ -160,7 +168,6 @@ class _EchartsState extends State<Echarts> {
   @override
   Widget build(BuildContext context) {
     return WebViewWidget(
-        controller: _controller!,
-        gestureRecognizers: getGestureRecognizers());
+        controller: _controller!, gestureRecognizers: getGestureRecognizers());
   }
 }
