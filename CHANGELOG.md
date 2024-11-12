@@ -1,3 +1,10 @@
+## 2.5.1
+
+**2024-11-12**
+
+- Upgrade Echarts to 5.5.1
+- Fix Uncaught ReferenceError: Messager is not defined https://github.com/entronad/flutter_echarts/issues/190
+
 ## 2.5.0
 
 **2023-08-31**
